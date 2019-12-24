@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Django Audiobooks app</title>
+</head>
+<body>
+
+    <h3>{{ audiobook.title }}</h3>
+    {% if audiobook.author %}
+        <p>
+            author: <b>{{ audiobook.author }}</b>
+        </p>
+    {% endif %}
+    {% if audiobook.narrator %}
+        <p>narrator: <b>{{ audiobook.narrator }}</b></p>
+    {% endif %}
+    {% if audiobook.release_date %}
+        <p>date of release: <b>{{ audiobook.format_date }}</b></p>
+    {% endif %}
+    {% if audiobook.length %}
+        <p>length: <b>{{ audiobook.format_length }}</b></p>
+    {% endif %}
+
+    <h4>Readers' reviews:</h4>
+    <ul>
+    {% for review in audiobook.review_set.all %}
+        <li><b>{{ review.get_rating_display }}</b>; <em>{{ review.comment }}</em> ({{ review.timestamp_as_date }})</li>
+    {% endfor %}
+    </ul>
+
+    <p>
+        <a href="{% url 'audiobooks:detail' audiobook.id %}">Add another review</a>
+    </p>
+    <p>
+        <a href="{% url 'audiobooks:index' %}">Back to the list of recent audiobooks</a>
+    </p>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audiobooks Django app</title>
+</head>
+<body>
+
+    {% if latest_audiobooks.count == 0 %}
+        <h3>ERROR - could not retrieve information about the latest books. Please try again in a few minutes</h3>
+    {% else %}
+        <h3>Latest books:</h3>
+        <ul>
+        {% for book in latest_audiobooks %}
+            <li><a href="{% url 'audiobooks:detail' book.id %}">{{ book.title }}</a> by {{ book.author }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audiobooks Django app</title>
+</head>
+<body>
+
+    {% if audiobook %}
+        <h3>{{ audiobook.title }}</h3>
+        {% if audiobook.author %}
+            <p>author: <b>{{ audiobook.author }}</b></p>
+        {% endif %}
+        {% if audiobook.narrator %}
+            <p>narrator: <b>{{ audiobook.narrator }}</b></p>
+        {% endif %}
+        {% if audiobook.release_date %}
+            <p>date of release: <b>{{ audiobook.format_date }}</b></p>
+        {% endif %}
+        {% if audiobook.length %}
+            <p>length: <b>{{ audiobook.format_length }}</b></p>
+        {% endif %}
+        {% if audiobook.review_set.count == 0 %}
+            <h4>No reviews yet!</h4>
+        {% else %}
+            <h4>Reviews:</h4>
+            <ul>
+            {% for review in audiobook.review_set.all %}
+                <li><b>{{ review.get_rating_display }}</b>;
+                    <em>{{ review.comment }}</em> ({{ review.timestamp_as_date }})</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <h4>Add a new review:</h4>
+
+        {% if err_msg %}
+        <p>
+            <h4>{{ err_msg }}</h4>
+        </p>
+        {% endif %}
+
+        <form action="{% url 'audiobooks:review' audiobook.id %}" method="post">
+            {% csrf_token %}
+            <p>
+                <label for="rating">Rating: </label>
+                <select name="rating">
+                    {% for rating_val, rating_lbl in rating_options %}
+                        <option value="{{ rating_val }}">{{ rating_lbl }}</option>
+                    {% endfor %}
+                </select>
+            </p>
+            <p>
+                <label for="comment">Comment: </label>
+            </p>
+            <textarea name="comment" rows="5" cols="80"></textarea>
+            <p>
+                <input type="submit" value="Add Review">
+            </p>
+        </form>
+
+    {% else %}
+        <h3>Could not retrieve information about the chosen audiobook</h3>
+    {% endif %}
+
+    <a href="{% url 'audiobooks:index' %}">Back to the list of the latest audiobooks</a>
+
+</body>
+</html>

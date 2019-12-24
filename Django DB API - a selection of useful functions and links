@@ -1,0 +1,56 @@
+To work with our data (models) in the database, we first need to import the classes that define the data structure (models):
+from audiobooks.models import Audiobook, Review
+
+Some useful commands for working with the stored data (using the Audiobook and Review models for the examples):
+
+Audiobook.objects.all()
+
+Audiobook.objects.filter(id=1) # retrieve the first audiobook
+
+Audiobook.objects.filter(author__startswith='Bob') #author is an attribute, so in general, it would be <att_name>__startswith=val
+
+Audiobook.objects.filter(title__contains='London')
+
+Audiobook.objects.filter(release_date__year = date.today().year)
+
+So, the pattern is <attribute_name>__<field_or_method_name> = <value>
+
+In general, the API automatically follows relationships as far as you need.
+Use double underscores to connect an attribute with a method or property name;
+this works as many levels deep as you want; for example: get reviews of all audiobooks published this year:
+Review.objects.filter(audiobook__release_date__year = date.today().year)
+
+We can also combine multiple conditions in a filter:
+Review.objects.filter(rating__gte=4, audiobook__author__endswith='Uris')
+
+One can also use comparison operators, using a special syntax, as follows:
+__gte ("Greater than or equal"), __gt (greater than), __lt (less than), __lte, etc.
+For example, to select audiobooks with length greater than 900 minutes (15 hours):
+Audiobook.objects.filter(length__gt=900)
+
+Or, we may want to retrieve audiobooks with length greater than 900 minutes and ratings higher or equal to 4:
+Audiobook.objects.filter(length__gt=900, review__rating__gte=4)
+
+as this query may return duplicate results (possible when the query spans multiple tables, as is the case here),
+we can remove duplicates by using distinct():
+Audiobook.objects.filter(length__gt=900, review__rating__gte=4).distinct()
+
+For more on how to use double underscores to perform field lookups via the API, see Field lookups:
+https://docs.djangoproject.com/en/3.0/topics/db/queries/#field-lookups-intro
+as well as the field lookup reference (part of Django DB API):
+https://docs.djangoproject.com/en/3.0/ref/models/querysets/#field-lookups
+
+We can use attributes defined as ForeignKey fields to get from one object to the collection of objects associated
+with it through the ForeignKey field; for example, to get reviews for an audiobook (a1):
+a1.review_set.all() 	# the pattern: <class_name>_set
+
+or for a particular audiobook (a1), get reviews with rating equal to or above 4:
+a1.review_set.filter(rating__gte=4)
+
+We can also create associated objects; e.g., to create a review for an audiobook (a2):
+a2.review_set.create(comment="A tour de force of historical fiction", rating=5)
+
+For more information on model relations, see Accessing related objects:
+https://docs.djangoproject.com/en/3.0/ref/models/relations/
+A complete guideline (documentation) for creating, retrieving, updating and deleting objects through
+database-abstraction API is given here: https://docs.djangoproject.com/en/3.0/topics/db/queries/
